@@ -1,0 +1,470 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Wanda Maximoff — Scarlet Witch (Fanpage)</title>
+
+<!--
+  IMPORTANT:
+  1) Upload gambar-gambarmu ke repo (misal folder: img/)
+     Contoh nama file yang dipakai di bawah:
+     - img/1bd99a16f10e547ca90b1b33345049f4.jpg   <-- (gambar yang kamu upload sebelumnya)
+     - img/wanda2.jpg
+     - img/wanda3.jpg
+     - img/wanda4.jpg
+  2) Jika nama file beda, ubah path di array `galleryImages` di bagian JS dan background-image CSS.
+-->
+
+<style>
+  :root{
+    --bg-1: #050203;
+    --bg-2: #140008;
+    --accent: #ff2e63; /* utama */
+    --accent-2:#ff0048;
+    --muted: #cfcfcf;
+    --card: rgba(255,255,255,0.03);
+    --glass: rgba(255,255,255,0.04);
+    --maxw: 1100px;
+  }
+
+  /* RESET */
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial}
+  body{
+    background: linear-gradient(180deg, var(--bg-1), var(--bg-2));
+    color: #fff;
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    overflow-x:hidden;
+  }
+
+  /* CHAOS PARTICLES (canvas background) */
+  #chaosCanvas{
+    position:fixed;inset:0;z-index:0;pointer-events:none;opacity:0.85;
+    mix-blend-mode:screen;
+  }
+
+  /* header */
+  header{
+    position:fixed;left:0;right:0;top:0;height:68px;
+    display:flex;align-items:center;justify-content:center;
+    background: rgba(0,0,0,0.45);backdrop-filter: blur(6px);
+    border-bottom:1px solid rgba(255,46,99,0.06);z-index:50;
+  }
+  header h1{
+    margin:0;padding:8px 18px;font-size:1.4rem;font-weight:700;
+    color:var(--accent);letter-spacing:1px;
+    position:relative;
+  }
+  /* glow pulse (applied by .glow-red) */
+  @keyframes pulse-glow {
+    0% {
+      text-shadow:
+        0 0 8px #ff2e63,
+        0 0 16px #ff2e63,
+        0 0 32px #ff2e63,
+        0 0 64px rgba(255,0,72,0.6);
+    }
+    50% {
+      text-shadow:
+        0 0 16px #ff0048,
+        0 0 32px #ff0048,
+        0 0 56px #ff0048,
+        0 0 100px rgba(255,46,99,0.85);
+    }
+    100% {
+      text-shadow:
+        0 0 8px #ff2e63,
+        0 0 16px #ff2e63,
+        0 0 32px #ff2e63,
+        0 0 64px rgba(255,0,72,0.6);
+    }
+  }
+
+  .glow-red{
+    color:var(--accent);animation:pulse-glow 2.2s ease-in-out infinite alternate;
+  }
+
+  /* main hero (big background image using user's file) */
+  .hero{
+    min-height:82vh;padding-top:68px; /* push under header */
+    display:flex;align-items:center;justify-content:center;position:relative;z-index:10;
+    overflow:hidden;
+  }
+  .hero::before{
+    /* change url if your background filename different */
+    content:"";
+    position:absolute;inset:0;background-image:
+      linear-gradient(180deg, rgba(0,0,0,0.35), rgba(0,0,0,0.6)),
+      url('img/1bd99a16f10e547ca90b1b33345049f4.jpg');
+    background-size:cover;background-position:center;
+    filter:contrast(.95) saturate(1.05) brightness(.55);
+    transform:scale(1.03);z-index:-1;
+  }
+
+  .hero-inner{
+    max-width:var(--maxw);width:100%;padding:48px 18px;text-align:center;
+  }
+  .hero-title{font-size:3.2rem;margin:8px 0;}
+  .hero-sub{max-width:740px;margin:16px auto;color:#e6d6d6;font-size:1.05rem;line-height:1.6}
+  .hero-cta{margin-top:18px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+  .btn{
+    padding:10px 18px;border-radius:999px;border:2px solid var(--accent);
+    color:var(--accent);background:transparent;font-weight:700;cursor:pointer;
+    transition:all .25s ease;box-shadow:0 8px 28px rgba(255,46,99,0.06)
+  }
+  .btn:hover{background:var(--accent);color:#111;transform:translateY(-3px);box-shadow:0 20px 60px rgba(255,46,99,0.18)}
+
+  /* container sections */
+  section{padding:56px 18px 36px;position:relative;z-index:10}
+  .container{max-width:var(--maxw);margin:0 auto}
+
+  h2.section-title{font-size:2.2rem;margin:10px 0 18px;color:var(--accent);text-align:center}
+  h2.section-title.glow{display:inline-block;padding:6px 8px;border-radius:10px}
+
+  /* layout for cards */
+  .power-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px}
+  .card{background:var(--card);border-radius:14px;padding:18px;border:1px solid rgba(255,255,255,0.03);box-shadow:0 10px 30px rgba(0,0,0,0.55)}
+  .card h3{margin:0 0 10px;color:var(--accent)}
+  .card p{color:#ddd}
+
+  /* gallery */
+  .gallery-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+  .thumb{border-radius:10px;overflow:hidden;border:1px solid rgba(255,255,255,0.04);cursor:pointer}
+  .thumb img{width:100%;height:140px;object-fit:cover;display:block;transition:transform .35s ease}
+  .thumb:hover img{transform:scale(1.06)}
+
+  /* lightbox */
+  .lightbox{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,0.8);z-index:120}
+  .lightbox.show{display:flex}
+  .lightbox-inner{max-width:92%;max-height:92%;position:relative}
+  .lightbox img{max-width:100%;max-height:85vh;border-radius:8px}
+  .lb-close,.lb-prev,.lb-next{position:absolute;background:rgba(0,0,0,0.55);color:#fff;padding:8px;border-radius:6px;border:1px solid rgba(255,255,255,0.06);cursor:pointer}
+  .lb-close{right:-12px;top:-12px}
+  .lb-prev{left:-48px;top:45%}
+  .lb-next{right:-48px;top:45%}
+
+  /* timeline */
+  .timeline{position:relative;margin:30px 0; padding-left:20px}
+  .timeline:before{content:"";position:absolute;left:14px;top:0;bottom:0;width:3px;background:linear-gradient(180deg,var(--accent),var(--accent-2));border-radius:3px}
+  .tl-item{position:relative;margin:18px 0;padding-left:20px}
+  .tl-item .dot{position:absolute;left:-6px;top:6px;width:14px;height:14px;border-radius:50%;background:var(--accent);box-shadow:0 0 14px rgba(255,46,99,0.6)}
+  .tl-item h4{margin:0 0 6px;color:var(--accent)}
+  .tl-item p{margin:0;color:#ddd}
+
+  /* relationships */
+  .rel-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-top:12px}
+  .rel-card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); padding:12px;border-radius:10px;text-align:center}
+
+  /* quotes */
+  .quote{font-style:italic;color:#ffd6e1;border-left:4px solid rgba(255,46,99,0.2);padding:12px;margin:12px 0;border-radius:6px;color:#ffd6e1;background:linear-gradient(180deg, rgba(255,46,99,0.02), transparent)}
+
+  /* reveal on scroll */
+  .hidden{opacity:0;transform:translateY(18px);transition:all .6s cubic-bezier(.2,.9,.3,1)}
+  .show{opacity:1;transform:none}
+
+  /* footer */
+  footer{padding:28px 18px;text-align:center;color:var(--muted);border-top:1px solid rgba(255,46,99,0.03)}
+
+  /* responsive tweaks */
+  @media (max-width:900px){
+    .hero-title{font-size:2.2rem}
+    .hero-sub{font-size:0.98rem}
+  }
+</style>
+</head>
+<body>
+
+<!-- Canvas for chaos particles -->
+<canvas id="chaosCanvas" aria-hidden="true"></canvas>
+
+<header>
+  <h1 class="glow-red">Scarlet Witch</h1>
+</header>
+
+<main>
+  <!-- HERO -->
+  <section class="hero" id="home" aria-labelledby="hero-title">
+    <div class="hero-inner container">
+      <h2 id="hero-title" class="hero-title glow-red" style="font-weight:800">Wanda Maximoff</h2>
+      <p class="hero-sub">Sorceress & manipulator of reality. Fanpage ini dibuat untuk tugas dan latihan web — penuh efek magis khas Scarlet Witch.</p>
+      <div class="hero-cta">
+        <button class="btn" onclick="smoothScroll('#about')">Tentang</button>
+        <button class="btn" onclick="smoothScroll('#powers')">Kekuatan</button>
+        <button class="btn" onclick="smoothScroll('#gallery')">Galeri</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about">
+    <div class="container">
+      <h2 class="section-title glow">Tentang Wanda</h2>
+      <div class="card" style="margin-bottom:18px">
+        <h3 class="glow-red" style="margin-top:0">Siapa Wanda Maximoff?</h3>
+        <p>Wanda Maximoff, dikenal sebagai <strong>Scarlet Witch</strong>, adalah karakter Marvel yang memiliki kemampuan sihir Chaos—mampu mempengaruhi realitas, pikiran, dan energi. Ia pernah menjadi anggota Avengers dan mengalami perjalanan hidup yang kompleks, dari menjadi pahlawan hingga tokoh yang konflik dan tragis.</p>
+      </div>
+
+      <h3 class="section-subtitle glow-red" style="margin-top:6px">Asal-Usul & Perjalanan</h3>
+      <div class="card" style="margin-bottom:12px">
+        <p><strong>Asal:</strong> Lahir di Sokovia. Awalnya diperkenalkan sebagai saudara Pietro (Quicksilver), Wanda tumbuh dalam situasi perang dan eksperimen. Seiring waktu ia menemukan kemampuan magisnya — Chaos Magic — yang mengubah jalannya kehidupan.</p>
+      </div>
+
+      <h3 class="section-subtitle glow-red" style="margin-top:6px">Kutipan Terkenal</h3>
+      <div class="quote">"You break the rules and become a hero... I do it and I become the enemy." — Scarlet Witch</div>
+    </div>
+  </section>
+
+  <!-- POWERS -->
+  <section id="powers">
+    <div class="container">
+      <h2 class="section-title glow">Kekuatan Utama</h2>
+      <div class="power-grid">
+        <div class="card hidden">
+          <h3>Sihir Chaos</h3>
+          <p>Kekuatan realitas yang memungkinkan Wanda mengubah struktur alam semesta pada tingkat fundamental.</p>
+        </div>
+        <div class="card hidden">
+          <h3>Energi Hex</h3>
+          <p>Pancaran energi merah yang bisa menghancurkan, menahan, atau mengubah objek / makhluk.</p>
+        </div>
+        <div class="card hidden">
+          <h3>Telekinesis</h3>
+          <p>Mengangkat, mendorong, atau memanipulasi objek dan makhluk dari jarak jauh.</p>
+        </div>
+        <div class="card hidden">
+          <h3>Manipulasi Pikiran & Ilusi</h3>
+          <p>Menciptakan realitas alternatif, memanipulasi ingatan, dan menghasilkan ilusi sangat realistis.</p>
+        </div>
+      </div>
+
+      <h3 style="margin-top:22px" class="glow-red">Timeline Singkat</h3>
+      <div class="timeline">
+        <div class="tl-item">
+          <div class="dot"></div>
+          <h4>Debut & Asal</h4>
+          <p>Wanda tampil pertama kali di komik sebagai bagian dari Brotherhood of Evil Mutants (kemudian bergabung dengan Avengers).</p>
+        </div>
+        <div class="tl-item">
+          <div class="dot"></div>
+          <h4>House of M</h4>
+          <p>Peristiwa besar di mana Wanda mengubah realitas secara masif — konsekuensi besar bagi dunia Marvel.</p>
+        </div>
+        <div class="tl-item">
+          <div class="dot"></div>
+          <h4>Perjalanan Terbaru</h4>
+          <p>Peran Wanda berkembang antara pahlawan, antihero, hingga sosok tragis yang berjuang dengan kekuatannya.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- RELATIONSHIPS -->
+  <section id="relationships">
+    <div class="container">
+      <h2 class="section-title glow">Hubungan & Aliansi</h2>
+      <div class="rel-grid">
+        <div class="rel-card">
+          <h4 class="glow-red">Vision</h4>
+          <p>Sahabat, pasangan, dan hubungan yang rumit — hubungan mereka sangat mempengaruhi alur cerita Wanda.</p>
+        </div>
+        <div class="rel-card">
+          <h4 class="glow-red">Pietro / Quicksilver</h4>
+          <p>Adik angkat / saudara yang sangat dekat — pengaruh keluarga sangat terasa dalam keputusan Wanda.</p>
+        </div>
+        <div class="rel-card">
+          <h4 class="glow-red">Agatha Harkness</h4>
+          <p>Pembimbing magis / antagonis dalam beberapa versi cerita — memainkan peran penting dalam pemahaman sihir Wanda.</p>
+        </div>
+        <div class="rel-card">
+          <h4 class="glow-red">Doctor Strange</h4>
+          <p>Sosok magis yang terlibat ketika realitas dan sihir bertabrakan — dinamika antara mereka kompleks.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- GALLERY -->
+  <section id="gallery">
+    <div class="container">
+      <h2 class="section-title glow">Galeri Wanda</h2>
+
+      <div class="gallery-grid" id="galleryGrid">
+        <!-- thumbnails di-inject oleh JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- TIMELINE / EXTRA -->
+  <section id="extra">
+    <div class="container">
+      <h2 class="section-title glow">Lebih Lanjut</h2>
+      <p class="card">Ingin menambahkan lebih banyak gambar atau referensi? Upload file baru ke folder <code>img/</code> di repository-mu dan tambahkan namanya ke array gambar di bawah (bagian JS).</p>
+    </div>
+  </section>
+
+</main>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox" aria-hidden="true" role="dialog" aria-label="Image viewer">
+  <div class="lightbox-inner">
+    <button id="lbClose" class="lb-close" aria-label="Close">✕</button>
+    <button id="lbPrev" class="lb-prev" aria-label="Previous">◀</button>
+    <button id="lbNext" class="lb-next" aria-label="Next">▶</button>
+    <img id="lbImg" alt="Large view" src="">
+  </div>
+</div>
+
+<footer>
+  <div class="container">
+    <p>© 2025 Scarlet Witch — Fanpage. Dibuat oleh kamu. Hosted on GitHub Pages.</p>
+  </div>
+</footer>
+
+<script>
+/* ===== SMOOTH SCROLL helper ===== */
+function smoothScroll(sel){
+  const el = document.querySelector(sel);
+  if(el) el.scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+/* ===== reveal on scroll ===== */
+const ro = new IntersectionObserver((entries)=>{
+  entries.forEach(en=>{
+    if(en.isIntersecting) en.target.classList.add('show');
+  });
+},{threshold: .12});
+document.querySelectorAll('.hidden').forEach(el=>ro.observe(el));
+
+/* ===== GALLERY - sesuaikan nama file sesuai yang kamu upload =====
+   Upload ke repo di folder img/ lalu pastikan nama-nya sama di array ini.
+*/
+const galleryImages = [
+  {src:'img/1bd99a16f10e547ca90b1b33345049f4.jpg', alt:'Wanda 1'},
+  {src:'img/wanda2.jpg', alt:'Wanda 2'},
+  {src:'img/wanda3.jpg', alt:'Wanda 3'},
+  {src:'img/wanda4.jpg', alt:'Wanda 4'}
+];
+
+const grid = document.getElementById('galleryGrid');
+galleryImages.forEach((g,i)=>{
+  const div = document.createElement('div');
+  div.className='thumb';
+  div.dataset.index = i;
+  div.innerHTML = `<img loading="lazy" src="${g.src}" alt="${g.alt}"><div style="padding:8px;background:linear-gradient(180deg,transparent,rgba(0,0,0,0.35));color:#fff;font-weight:600">${g.alt}</div>`;
+  grid.appendChild(div);
+});
+
+/* LIGHTBOX */
+const lb = document.getElementById('lightbox');
+const lbImg = document.getElementById('lbImg');
+let currentIndex = 0;
+
+function openLightbox(idx){
+  currentIndex = idx;
+  lbImg.src = galleryImages[idx].src;
+  lbImg.alt = galleryImages[idx].alt;
+  lb.classList.add('show');
+  lb.setAttribute('aria-hidden','false');
+}
+function closeLightbox(){
+  lb.classList.remove('show');
+  lb.setAttribute('aria-hidden','true');
+  lbImg.src = '';
+}
+function prevImg(){
+  currentIndex = (currentIndex-1+galleryImages.length)%galleryImages.length;
+  lbImg.src = galleryImages[currentIndex].src;
+}
+function nextImg(){
+  currentIndex = (currentIndex+1)%galleryImages.length;
+  lbImg.src = galleryImages[currentIndex].src;
+}
+
+grid.addEventListener('click',e=>{
+  const t = e.target.closest('.thumb');
+  if(!t) return;
+  openLightbox(Number(t.dataset.index));
+});
+document.getElementById('lbClose').addEventListener('click', closeLightbox);
+document.getElementById('lbPrev').addEventListener('click', prevImg);
+document.getElementById('lbNext').addEventListener('click', nextImg);
+document.addEventListener('keydown', e=>{
+  if(!lb.classList.contains('show')) return;
+  if(e.key==='Escape') closeLightbox();
+  if(e.key==='ArrowLeft') prevImg();
+  if(e.key==='ArrowRight') nextImg();
+});
+lb.addEventListener('click', e=>{ if(e.target===lb) closeLightbox(); });
+
+/* small fail-safe: hide thumb if image 404 */
+window.addEventListener('load', ()=>{
+  document.querySelectorAll('.thumb img').forEach(img=>{
+    img.onerror = ()=> img.closest('.thumb').style.display='none';
+  });
+});
+
+/* ===== CHAOS PARTICLE EFFECT using canvas ===== */
+(function(){
+  const canvas = document.getElementById('chaosCanvas');
+  const ctx = canvas.getContext('2d');
+  let W, H, particles;
+
+  function resize(){
+    W = canvas.width = innerWidth;
+    H = canvas.height = innerHeight;
+  }
+  function rand(min,max){return Math.random()*(max-min)+min}
+
+  class Particle {
+    constructor(){
+      this.reset();
+    }
+    reset(){
+      this.x = rand(0,W);
+      this.y = rand(0,H);
+      this.r = rand(1.2,6);
+      this.vx = rand(-0.2,0.2);
+      this.vy = rand(-0.2,0.2);
+      this.life = rand(60,240);
+      this.age = 0;
+      this.h = rand(330,360); // reddish hues
+      this.alpha = rand(0.06,0.22);
+    }
+    step(){
+      this.x += this.vx;
+      this.y += this.vy;
+      this.age++;
+      if(this.age>this.life) this.reset();
+    }
+    draw(){
+      const g = ctx.createRadialGradient(this.x,this.y,0,this.x,this.y,this.r*8);
+      g.addColorStop(0, `hsla(${this.h},95%,60%,${this.alpha})`);
+      g.addColorStop(1, `hsla(${this.h},95%,40%,0)`);
+      ctx.beginPath();
+      ctx.fillStyle = g;
+      ctx.arc(this.x,this.y,this.r,0,Math.PI*2);
+      ctx.fill();
+    }
+  }
+
+  function init(){
+    resize();
+    particles = [];
+    const count = Math.round((W*H)/80000);
+    for(let i=0;i<count;i++) particles.push(new Particle());
+  }
+  function step(){
+    ctx.clearRect(0,0,W,H);
+    ctx.globalCompositeOperation = 'lighter';
+    particles.forEach(p=>{ p.step(); p.draw(); });
+    requestAnimationFrame(step);
+  }
+  window.addEventListener('resize', ()=>{ init(); });
+  init(); step();
+})();
+
+</script>
+</body>
+</html>
